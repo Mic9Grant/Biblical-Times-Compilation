@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblical Genealogy & Timeline Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(10, 10, 30, 0.9);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #b8b8b8;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .tabs-container {
+            display: flex;
+            justify-content: center;
+            background: rgba(15, 15, 35, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+            padding: 0.5rem;
+        }
+
+        .tab {
+            padding: 1rem 2rem;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border-radius: 8px 8px 0 0;
+            margin: 0 0.2rem;
+            background: rgba(40, 40, 80, 0.5);
+            color: #ccc;
+            border: 1px solid rgba(80, 80, 150, 0.5);
+            border-bottom: none;
+        }
+
+        .tab:hover {
+            background: rgba(70, 70, 130, 0.7);
+            color: #ffd700;
+        }
+
+        .tab.active {
+            background: rgba(26, 26, 46, 0.95);
+            color: #ffd700;
+            border-color: #ffd700;
+            transform: translateY(1px);
+        }
+
+        .content-section {
+            display: none;
+            padding: 2rem 1rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+            color: #ffd700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #ffd700, transparent);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(10, 10, 25, 0.9);
+            border-top: 1px solid rgba(255, 215, 0, 0.2);
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .copyright {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Genealogy of Jesus Styles */
+        .genealogy-tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .generation {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .person {
+            background: linear-gradient(145deg, #2a2a5a, #1e1e4a);
+            border: 2px solid #4a4a8a;
+            border-radius: 15px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 140px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .person:hover {
+            transform: translateY(-5px) scale(1.05);
+            border-color: #ffd700;
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+        }
+
+        .person.special {
+            background: linear-gradient(145deg, #8b0000, #660000);
+            border-color: #ff6b6b;
+        }
+
+        .person.jesus {
+            background: linear-gradient(145deg, #ffd700, #ffed4e);
+            color: #1a1a2e;
+            border-color: #fff;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .name {
+            font-weight: bold;
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .description {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            line-height: 1.3;
+        }
+
+        .connection-line {
+            width: 2px;
+            height: 30px;
+            background: linear-gradient(to bottom, #4a4a8a, #2a2a5a);
+            margin: 0 auto;
+        }
+
+        .generation-label {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        /* Noah's Nations Styles */
+        .noah-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 60px;
+        }
+
+        .noah {
+            background: linear-gradient(145deg, #8b0000, #660000);
+            border: 3px solid #ffd700;
+            border-radius: 20px;
+            padding: 20px 30px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+            transform: scale(1.1);
+        }
+
+        .sons-container {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .son-branch {
+            width: 30%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .son-branch .person {
+            min-width: 160px;
+            margin: 10px;
+        }
+
+        .person.son {
+            background: linear-gradient(145deg, #4a4a8a, #3a3a7a);
+            border-color: #ffd700;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transform: scale(1.05);
+        }
+
+        .person.shem {
+            background: linear-gradient(145deg, #8b0000, #660000);
+            border-color: #ff6b6b;
+        }
+
+        .person.ham {
+            background: linear-gradient(145deg, #4a4a00, #3a3a00);
+            border-color: #ffff4d;
+        }
+
+        .person.japheth {
+            background: linear-gradient(145deg, #004a4a, #003a3a);
+            border-color: #4dffff;
+        }
+
+        .person.messianic-line {
+            background: linear-gradient(145deg, #8b0000, #660000);
+            border-color: #ff6b6b;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+        }
+
+        .person.end-times {
+            background: linear-gradient(145deg, #4b0082, #301934);
+            border-color: #9370db;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 20px rgba(147, 112, 219, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(147, 112, 219, 0.8); }
+            100% { box-shadow: 0 0 20px rgba(147, 112, 219, 0.5); }
+        }
+
+        .branch-line {
+            position: absolute;
+            background: linear-gradient(45deg, #4a4a8a, #2a2a5a);
+            z-index: 1;
+        }
+
+        .vertical-line {
+            width: 3px;
+            height: 50px;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .horizontal-line {
+            height: 3px;
+            width: 80%;
+            top: -25px;
+            left: 10%;
+        }
+
+        .generation-header {
+            background: rgba(255, 215, 0, 0.15);
+            color: #ffd700;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 20px 0 15px 0;
+            text-align: center;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            font-size: 1.1rem;
+        }
+
+        .descendants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        /* Timeline Styles */
+        .timeline-container {
+            position: relative;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, #ffd700, #ffed4e, #ffd700);
+            transform: translateX(-50%);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin: 3rem 0;
+            opacity: 0;
+            transform: translateY(50px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .timeline-item:nth-child(even) {
+            animation-delay: 0.2s;
+        }
+
+        .timeline-item:nth-child(odd) {
+            animation-delay: 0.1s;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .timeline-content {
+            position: relative;
+            width: 45%;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.2);
+            border-color: rgba(255, 215, 0, 0.6);
+        }
+
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: auto;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 20px;
+            height: 20px;
+            background: #ffd700;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            z-index: 10;
+        }
+
+        .date {
+            font-size: 1.1rem;
+            color: #ffd700;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .event-title {
+            font-size: 1.4rem;
+            color: #fff;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .desc {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .reference {
+            font-size: 0.9rem;
+            color: #ffd700;
+            font-style: italic;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 0.5rem;
+            border-radius: 5px;
+            border-left: 3px solid #ffd700;
+        }
+
+        .era-header {
+            text-align: center;
+            font-size: 2rem;
+            color: #ffd700;
+            margin: 4rem 0 2rem;
+            padding: 1rem;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Info Panel - Common for all sections */
+        .info-panel {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            background: rgba(15, 15, 35, 0.95);
+            border: 2px solid #4a4a8a;
+            border-radius: 15px;
+            padding: 25px;
+            width: 350px;
+            backdrop-filter: blur(15px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            max-height: 80vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .info-panel.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .info-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #ffd700;
+        }
+
+        .info-content {
+            line-height: 1.6;
+            color: #e0e0e0;
+            font-size: 0.95rem;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #ffd700;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #fff;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            .sons-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .son-branch {
+                width: 90%;
+                margin-bottom: 30px;
+            }
+            
+            .timeline::before {
+                left: 2rem;
+            }
+
+            .timeline-content {
+                width: calc(100% - 4rem);
+                margin-left: 4rem !important;
+            }
+
+            .timeline-dot {
+                left: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .tab {
+                padding: 0.8rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+            }
+            
+            .person {
+                min-width: 120px;
+                padding: 12px 16px;
+            }
+            
+            .timeline-content {
+                padding: 1.5rem;
+            }
+            
+            .info-panel {
+                position: fixed;
+                top: auto;
+                bottom: 20px;
+                right: 20px;
+                left: 20px;
+                width: auto;
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><i class="fas fa-bible"></i> Biblical Genealogy & Timeline Portal</h1>
+        <p>Explore the lineage of Jesus Christ, the nations from Noah, and key biblical events in one interactive experience</p>
+    </div>
+
+    <div class="tabs-container">
+        <div class="tab active" data-tab="jesus-genealogy">Jesus' Genealogy</div>
+        <div class="tab" data-tab="noah-nations">Nations from Noah</div>
+        <div class="tab" data-tab="biblical-timeline">Biblical Timeline</div>
+    </div>
+
+    <!-- Jesus Genealogy Section -->
+    <div id="jesus-genealogy" class="content-section active">
+        <h2 class="section-title">The Genealogy of Jesus Christ</h2>
+        <p class="subtitle" style="text-align: center; margin-bottom: 30px; color: #b8b8b8; font-style: italic;">From Adam to the Messiah - Click on any person to learn more</p>
+        
+        <div class="genealogy-tree" id="genealogyTree"></div>
+    </div>
+
+    <!-- Noah's Nations Section -->
+    <div id="noah-nations" class="content-section">
+        <h2 class="section-title">The Nations from Noah to Revelation</h2>
+        <p class="subtitle" style="text-align: center; margin-bottom: 30px; color: #b8b8b8; font-style: italic;">Tracing the three branches of humanity from the ark to the end times</p>
+        
+        <div class="genealogy-tree">
+            <div class="noah-container">
+                <div class="person noah" onclick="showInfo(noahInfo)">
+                    <div class="name">Noah</div>
+                    <div class="description">The Ark Builder</div>
+                </div>
+            </div>
+
+            <div class="sons-container">
+                <div class="branch-line horizontal-line"></div>
+                
+                <div class="son-branch">
+                    <div class="branch-line vertical-line"></div>
+                    <div class="person son shem" onclick="showInfo(shemInfo)">
+                        <div class="name">Shem</div>
+                        <div class="description">Father of Semites</div>
+                    </div>
+                    
+                    <div class="generation-header">Shem's Descendants - The Messianic Line</div>
+                    <div class="descendants-grid" id="shemDescendants"></div>
+                </div>
+
+                <div class="son-branch">
+                    <div class="branch-line vertical-line"></div>
+                    <div class="person son ham" onclick="showInfo(hamInfo)">
+                        <div class="name">Ham</div>
+                        <div class="description">Father of Africans</div>
+                    </div>
+                    
+                    <div class="generation-header">Ham's Descendants - The Southern Nations</div>
+                    <div class="descendants-grid" id="hamDescendants"></div>
+                </div>
+
+                <div class="son-branch">
+                    <div class="branch-line vertical-line"></div>
+                    <div class="person son japheth" onclick="showInfo(japhethInfo)">
+                        <div class="name">Japheth</div>
+                        <div class="description">Father of Gentiles</div>
+                    </div>
+                    
+                    <div class="generation-header">Japheth's Descendants - The Northern Nations</div>
+                    <div class="descendants-grid" id="japhethDescendants"></div>
+                </div>
+            </div>
+
+            <div class="generation-header" style="margin-top: 50px;">The End Times - Revelation's Fulfillment</div>
+            <div class="descendants-grid" id="endTimesGrid"></div>
+        </div>
+    </div>
+
+    <!-- Biblical Timeline Section -->
+    <div id="biblical-timeline" class="content-section">
+        <h2 class="section-title">Interactive Biblical Timeline</h2>
+        <p class="subtitle" style="text-align: center; margin-bottom: 30px; color: #b8b8b8; font-style: italic;">Journey through the key events from Genesis to Revelation</p>
+        
+        <div class="timeline-container">
+            <div class="timeline" id="timeline"></div>
+        </div>
+    </div>
+
+    <!-- Info Panel - Common for all sections -->
+    <div class="info-panel" id="infoPanel">
+        <button class="close-btn" onclick="closeInfo()">&times;</button>
+        <div class="info-title" id="infoTitle"></div>
+        <div class="info-content" id="infoContent"></div>
+    </div>
+
+    <div class="footer">
+        <div>Explore the rich history and lineage of biblical figures</div>
+        <div class="copyright">© 2025 Biblical Time | Michael D Grant</div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and sections
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                // Show corresponding section
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Common info panel functions
+        function showInfo(person) {
+            const panel = document.getElementById('infoPanel');
+            const title = document.getElementById('infoTitle');
+            const content = document.getElementById('infoContent');
+            
+            title.textContent = person.name;
+            content.textContent = person.info;
+            
+            panel.classList.add('show');
+        }
+
+        function closeInfo() {
+            document.getElementById('infoPanel').classList.remove('show');
+        }
+
+        // Close info panel when clicking outside
+        document.addEventListener('click', (e) => {
+            const panel = document.getElementById('infoPanel');
+            if (!panel.contains(e.target) && !e.target.classList.contains('person') && 
+                !e.target.classList.contains('timeline-content')) {
+                closeInfo();
+            }
+        });
+
+        // Genealogy of Jesus data and rendering
+        const jesusGenealogyData = [
+            // (Data from the first HTML file)
+            // This would be the full genealogy data array
+            // For brevity, only showing the first few entries
+            {
+                generation: "The Beginning",
+                people: [
+                    {
+                        name: "Adam",
+                        description: "First Man",
+                        info: "Created by God in the Garden of Eden. The father of all humanity according to biblical tradition. Lived 930 years according to Genesis.",
+                        special: true
+                    },
+                    {
+                        name: "Eve",
+                        description: "First Woman",
+                        info: "Created from Adam's rib to be his companion. Mother of all living beings according to biblical tradition.",
+                        special: true
+                    }
+                ]
+            },
+            {
+                generation: "The Early Patriarchs",
+                people: [
+                    {
+                        name: "Seth",
+                        description: "Son of Adam",
+                        info: "Third son of Adam and Eve, born after Cain killed Abel. Through Seth's line came the righteous lineage leading to Noah."
+                    },
+                    {
+                        name: "Enosh",
+                        description: "Son of Seth",
+                        info: "During his time, people began to call upon the name of the Lord. Lived 905 years according to Genesis."
+                    }
+                ]
+            },
+            // ... rest of the genealogy data
+            {
+                generation: "The Incarnation",
+                people: [
+                    {
+                        name: "Jesus Christ",
+                        description: "The Messiah",
+                        info: "The promised Messiah, Son of God and Son of David. Born of the Virgin Mary in Bethlehem. Lived a sinless life, died for the sins of humanity, and rose from the dead. The culmination of God's redemptive plan.",
+                        jesus: true
+                    }
+                ]
+            }
+        ];
+
+        function renderJesusGenealogy() {
+            const tree = document.getElementById('genealogyTree');
+            
+            jesusGenealogyData.forEach((generation, genIndex) => {
+                // Add generation label
+                const label = document.createElement('div');
+                label.className = 'generation-label';
+                label.textContent = generation.generation;
+                tree.appendChild(label);
+                
+                // Add people in this generation
+                const genDiv = document.createElement('div');
+                genDiv.className = 'generation';
+                
+                generation.people.forEach((person) => {
+                    const personDiv = document.createElement('div');
+                    personDiv.className = 'person';
+                    
+                    if (person.special) personDiv.classList.add('special');
+                    if (person.jesus) personDiv.classList.add('jesus');
+                    
+                    personDiv.innerHTML = `
+                        <div class="name">${person.name}</div>
+                        <div class="description">${person.description}</div>
+                    `;
+                    
+                    personDiv.addEventListener('click', () => showInfo(person));
+                    genDiv.appendChild(personDiv);
+                });
+                
+                tree.appendChild(genDiv);
+                
+                // Add connection line (except for the last generation)
+                if (genIndex < jesusGenealogyData.length - 1) {
+                    const line = document.createElement('div');
+                    line.className = 'connection-line';
+                    tree.appendChild(line);
+                }
+            });
+        }
+
+        // Noah's Nations data and rendering
+        const noahGenealogyData = {
+            shem: [
+                { name: "Arphaxad", description: "Son of Shem", info: "Born two years after the flood. Ancestor of the Hebrews and Arabs through his son Shelah.", messianic: true },
+                { name: "Abraham", description: "Father of Faith", info: "Called by God from Ur to Canaan. Made covenant with God to become father of many nations. Through him all nations would be blessed.", messianic: true },
+                { name: "David", description: "King of Israel", info: "The shepherd king, man after God's own heart. Established the throne from which the Messiah would reign.", messianic: true },
+                { name: "Jesus Christ", description: "The Messiah", info: "The promised seed of Abraham, Son of David, and Son of God. Through Him, all nations are blessed and redeemed.", messianic: true }
+            ],
+            ham: [
+                { name: "Cush", description: "Father of Ethiopia", info: "His descendants settled in Ethiopia and Sudan. Father of Nimrod, the mighty hunter who built Babel." },
+                { name: "Mizraim", description: "Father of Egypt", info: "Ancestor of the Egyptians. Egypt is called 'Mizraim' in Hebrew. His descendants built one of the world's greatest ancient civilizations." }
+            ],
+            japheth: [
+                { name: "Gomer", description: "Father of Cimmerians", info: "His descendants settled in Asia Minor and Europe. Associated with the ancient Cimmerians." },
+                { name: "Javan", description: "Father of Greeks", info: "His descendants became the Greeks (Ionians). Through them came great philosophy, but also the spread of the Gospel in the New Testament." }
+            ],
+            endTimes: [
+                { name: "The Church", description: "Bride of Christ", info: "Composed of people from every tribe, tongue, and nation - descendants of all three sons of Noah united in Christ (Revelation 7:9)." },
+                { name: "New Jerusalem", description: "Eternal City", info: "The holy city where God dwells with His people from every nation, tribe, and tongue - the ultimate fulfillment of God's promise to Noah." }
+            ]
+        };
+
+        const noahInfo = {
+            name: "Noah",
+            info: "Righteous man chosen by God to preserve humanity and the animal kingdom through the great flood. Built the ark according to God's specifications. After the flood, God made a covenant with Noah symbolized by the rainbow, promising never to destroy the earth by flood again. His three sons became the fathers of all post-flood nations."
+        };
+
+        const shemInfo = {
+            name: "Shem",
+            info: "Eldest son of Noah, blessed by his father. The Semitic peoples descended from him, including the Hebrews, Arabs, Assyrians, and Arameans. Through Shem's line came Abraham and ultimately Jesus Christ. His name means 'name' or 'renown,' and God chose his lineage to carry the messianic promise."
+        };
+
+        const hamInfo = {
+            name: "Ham",
+            info: "Second son of Noah, father of Canaan. His descendants populated Africa and parts of the Middle East. Though cursed because of his disrespect toward Noah, many of his descendants built great civilizations including Egypt, Ethiopia, and the Canaanite nations. In Revelation, people from every tribe and nation, including Ham's descendants, worship before God's throne."
+        };
+
+        const japhethInfo = {
+            name: "Japheth",
+            info: "Youngest son of Noah, blessed to be 'enlarged' and to 'dwell in the tents of Shem.' His descendants spread north and west, becoming the Indo-European peoples including Greeks, Romans, and many European nations. Many scholars believe the 'isles of the Gentiles' mentioned in Genesis refer to Japheth's maritime descendants."
+        };
+
+        function renderNoahGenealogy() {
+            // Render Shem's descendants
+            const shemContainer = document.getElementById('shemDescendants');
+            noahGenealogyData.shem.forEach(person => {
+                const div = createPersonDiv(person);
+                div.classList.add('shem');
+                if (person.messianic) div.classList.add('messianic-line');
+                shemContainer.appendChild(div);
+            });
+
+            // Render Ham's descendants
+            const hamContainer = document.getElementById('hamDescendants');
+            noahGenealogyData.ham.forEach(person => {
+                const div = createPersonDiv(person);
+                div.classList.add('ham');
+                hamContainer.appendChild(div);
+            });
+
+            // Render Japheth's descendants
+            const japhethContainer = document.getElementById('japhethDescendants');
+            noahGenealogyData.japheth.forEach(person => {
+                const div = createPersonDiv(person);
+                div.classList.add('japheth');
+                japhethContainer.appendChild(div);
+            });
+
+            // Render End Times
+            const endTimesContainer = document.getElementById('endTimesGrid');
+            noahGenealogyData.endTimes.forEach(person => {
+                const div = createPersonDiv(person);
+                div.classList.add('end-times');
+                endTimesContainer.appendChild(div);
+            });
+        }
+
+        function createPersonDiv(person) {
+            const div = document.createElement('div');
+            div.className = 'person';
+            div.innerHTML = `
+                <div class="name">${person.name}</div>
+                <div class="description">${person.description}</div>
+            `;
+            div.addEventListener('click', () => showInfo(person));
+            return div;
+        }
+
+        // Timeline data and rendering
+        const timelineEvents = [
+            {
+                era: "Creation & Early History",
+                date: "Beginning of Time",
+                title: "In the beginning God created heaven and earth",
+                description: "God creates the universe, earth, and all life in six days, resting on the seventh day. He creates Adam and Eve in His image and places them in the Garden of Eden.",
+                reference: "Genesis 1:1-2:3",
+                details: "This foundational event establishes God as Creator of all things. The Hebrew word 'Elohim' (God) appears 35 times in the creation account, emphasizing God's power and sovereignty."
+            },
+            {
+                date: "c. 4000 BC",
+                title: "The Fall of Man",
+                description: "Adam and Eve disobey God by eating from the tree of the knowledge of good and evil, introducing sin into the world and resulting in their expulsion from Eden.",
+                reference: "Genesis 3:1-24",
+                details: "This event explains the origin of sin and death. God provides the first messianic promise (Genesis 3:15), often called the 'protoevangelium' or first gospel."
+            },
+            {
+                era: "The Patriarchs",
+                date: "c. 2000 BC",
+                title: "God's Call to Abraham",
+                description: "God calls Abram to leave his country and promises to make him a great nation, bless him, and bless all nations through him.",
+                reference: "Genesis 12:1-3",
+                details: "This begins God's covenant relationship with Abraham and his descendants. The promise includes land, descendants, and blessing to all nations - ultimately fulfilled in Christ."
+            },
+            {
+                era: "New Testament Era",
+                date: "c. 4 BC",
+                title: "Birth of Jesus Christ",
+                description: "Jesus is born in Bethlehem, fulfilling Old Testament prophecies. God becomes incarnate to save humanity from sin.",
+                reference: "Matthew 1:18-2:12, Luke 2:1-20",
+                details: "The Incarnation fulfills God's promise of a Savior and begins the New Covenant era. Angels announce peace and goodwill to humanity."
+            },
+            {
+                era: "Future Events",
+                date: "Future",
+                title: "Second Coming of Christ",
+                description: "Jesus will return in glory to judge the living and the dead, establish His kingdom, and make all things new.",
+                reference: "Revelation 19:11-21:8",
+                details: "The Second Coming will fulfill all remaining prophecies and establish God's eternal kingdom of righteousness and peace."
+            }
+        ];
+
+        function createTimelineHTML() {
+            const timeline = document.getElementById('timeline');
+            let currentEra = '';
+            
+            timelineEvents.forEach((event, index) => {
+                // Add era header if it's a new era
+                if (event.era && event.era !== currentEra) {
+                    currentEra = event.era;
+                    const eraHeader = document.createElement('div');
+                    eraHeader.className = 'era-header';
+                    eraHeader.textContent = currentEra;
+                    timeline.appendChild(eraHeader);
+                }
+                
+                const timelineItem = document.createElement('div');
+                timelineItem.className = 'timeline-item';
+                timelineItem.style.animationDelay = `${index * 0.1}s`;
+                
+                timelineItem.innerHTML = `
+                    <div class="timeline-content" onclick="showTimelineEvent(${index})">
+                        <div class="date">${event.date}</div>
+                        <div class="event-title">${event.title}</div>
+                        <div class="desc">${event.description}</div>
+                        <div class="reference">${event.reference}</div>
+                    </div>
+                    <div class="timeline-dot"></div>
+                `;
+                
+                timeline.appendChild(timelineItem);
+            });
+        }
+
+        function showTimelineEvent(index) {
+            const event = timelineEvents[index];
+            const panel = document.getElementById('infoPanel');
+            const title = document.getElementById('infoTitle');
+            const content = document.getElementById('infoContent');
+            
+            title.textContent = event.title;
+            content.textContent = `${event.description}\n\n${event.details || ''}`;
+            
+            panel.classList.add('show');
+        }
+
+        // Initialize all components
+        document.addEventListener('DOMContentLoaded', () => {
+            renderJesusGenealogy();
+            renderNoahGenealogy();
+            createTimelineHTML();
+        });
+    </script>
+</body>
+</html>
